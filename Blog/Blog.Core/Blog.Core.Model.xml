@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Blog.Core.Model</name>
+    </assembly>
+    <members>
+        <member name="T:Blog.Core.Model.Class1">
+            <summary>
+            测试类库
+            </summary>
+        </member>
+        <member name="P:Blog.Core.Model.Class1.Name">
+            <summary>
+            姓名
+            </summary>
+        </member>
+    </members>
+</doc>
