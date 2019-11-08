@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Blog.Core
@@ -33,6 +36,7 @@ namespace Blog.Core
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
+
             #region Swagger
 
             services.AddSwaggerGen(c =>
@@ -49,7 +53,51 @@ namespace Blog.Core
 
                 var xmlModelPath = Path.Combine(basePath, "Blog.Core.Model.xml");
                 c.IncludeXmlComments(xmlModelPath);
-            });           
+
+                #region swagger 中开启jwt认证
+                //添加header验证信息
+                var security = new Dictionary<string, IEnumerable<string>> { { "Blog.Core", new string[] { } } };
+                c.AddSecurityRequirement(security);
+                c.AddSecurityDefinition("Blog.Core", new ApiKeyScheme
+                {
+                    Description = "JWT授权(数据将在请求头中进行传输) 直接在下框中输入Bearer {token}（注意两者之间是一个空格）",
+                    Name = "Authorization",
+                    In = "header",
+                    Type = "apiKey"
+                });
+
+                #endregion
+
+            });
+
+            #endregion
+
+            #region jwt 官方认证
+            var audienceConfig = Configuration.GetSection("Audience");
+            var symmetricKeyAsBase64 = audienceConfig["Secret"];
+            var KeyByteArray = Encoding.UTF8.GetBytes(symmetricKeyAsBase64);
+            var signingKey = new SymmetricSecurityKey(KeyByteArray);
+
+            services.AddAuthentication(x =>
+                {
+                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(option =>
+                {
+                    option.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer=true,
+                        ValidateAudience=true,
+                        ValidateLifetime=true,
+                        ValidateIssuerSigningKey=true,
+                        ValidIssuer= audienceConfig["Issuer"],//发行人
+                        ValidAudience= audienceConfig["Audience"],//订阅者
+                        IssuerSigningKey= signingKey
+
+                    };
+                });
+
 
             #endregion
         }
@@ -77,8 +125,8 @@ namespace Blog.Core
             {
                 app.UseExceptionHandler("/Error");
             }
-
-
+            //如果你想使用官方认证，必须在上边ConfigureService 中，配置JWT的认证服务 (.AddAuthentication 和 .AddJwtBearer 二者缺一不可)
+            app.UseAuthentication();
             app.UseMvc();
         }
     }
