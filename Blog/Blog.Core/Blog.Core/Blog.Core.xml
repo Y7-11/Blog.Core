@@ -33,20 +33,15 @@
             职能
             </summary>
         </member>
-        <member name="M:Blog.Core.Controllers.ValuesController.Get(System.Int32)">
+        <member name="M:Blog.Core.Controllers.BlogController.Get(System.Int32,System.Int32)">
             <summary>
-            获取value
+            sum
             </summary>
-            <param name="id"></param>
+            <param name="i"></param>
+            <param name="j"></param>
             <returns></returns>
         </member>
-        <member name="M:Blog.Core.Controllers.ValuesController.Post(Blog.Core.Model.Class1)">
-            <summary>
-            POST api/values
-            </summary>
-            <param name="c"></param>
-        </member>
-        <member name="M:Blog.Core.Startup.#ctor(Microsoft.Extensions.Configuration.IConfiguration)">
+        <member name="M:Blog.Core.Startup.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
             <summary>
             
             </summary>
