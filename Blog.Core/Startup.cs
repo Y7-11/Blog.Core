@@ -25,6 +25,7 @@ namespace Blog.Core
         /// 
         /// </summary>
         /// <param name="configuration"></param>
+        /// <param name="env"></param>
         public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
             Configuration = configuration;
